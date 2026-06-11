@@ -18,6 +18,7 @@ typedef struct {
 void inserirItem(Item mochila[], int* total);
 void removerItem(Item mochila[], int* total);
 void listarItens(Item mochila[], int total);
+void buscarItem(Item mochila[], int total);
 void limparBuffer();
 
 /* ============================================================================
@@ -30,7 +31,7 @@ int main() {
     int opcao = -1;
 
     while (1) {
-        // Cabeçalho exatamente igual aos Prints do material
+        // Cabeçalho exatamente igual aos Prints 1, 3 e 4
         printf("==================================================\n");
         printf("   MOCHILA DE SOBREVIVENCIA - CODIGO DA ILHA\n");
         printf("==================================================\n");
@@ -39,6 +40,7 @@ int main() {
         printf("1. Adicionar Item (Loot)\n");
         printf("2. Remover Item\n");
         printf("3. Listar Itens na Mochila\n");
+        printf("4. Buscar Item por Nome\n"); // Adicionado ao menu conforme requisito de busca
         printf("0. Sair\n");
         printf("--------------------------------------------------\n");
         printf("Escolha uma opcao: ");
@@ -57,7 +59,13 @@ int main() {
                 removerItem(mochila, &totalItens);
                 break;
             case 3:
+                // Apenas lista sem fazer alteracoes
                 listarItens(mochila, totalItens);
+                printf("\nPressione Enter para continuar...");
+                getchar();
+                break;
+            case 4:
+                buscarItem(mochila, totalItens);
                 printf("\nPressione Enter para continuar...");
                 getchar();
                 break;
@@ -75,7 +83,7 @@ int main() {
 }
 
 /* ============================================================================
- FUNCAO: Inserir Item (Loot) - Conforme Requisitos Visuais
+ FUNCAO: Inserir Item (Loot) - Conforme Print 2
  ============================================================================
  */
 void inserirItem(Item mochila[], int* total) {
@@ -101,13 +109,13 @@ void inserirItem(Item mochila[], int* total) {
     scanf("%d", &mochila[*total].quantidade);
     limparBuffer();
 
-    // Mensagem de confirmacao em tela
+    // Mensagem de confirmacao exata do Print 2
     printf("\nItem '%s' adicionado com sucesso!\n", mochila[*total].nome);
     
     // Incrementa o contador de itens totais por referencia
     (*total)++;
 
-    // Exibe a listagem atualizada imediatamente apos a operacao
+    // REQUISITO: Exibe a listagem atualizada imediatamente apos a operacao
     listarItens(mochila, *total);
     
     printf("\nPressione Enter para continuar...");
@@ -115,7 +123,7 @@ void inserirItem(Item mochila[], int* total) {
 }
 
 /* ============================================================================
- FUNCAO: Remover Item (Com Shifting/Deslocamento de memória)
+ FUNCAO: Remover Item - Conforme Prints 5 e 6
  ============================================================================
  */
 void removerItem(Item mochila[], int* total) {
@@ -135,7 +143,7 @@ void removerItem(Item mochila[], int* total) {
     scanf("%29s", nomeBusca);
     limparBuffer();
 
-    // Busca interna para encontrar a posicao do item para remocao
+    // Busca sequencial para encontrar a posicao do item
     for (i = 0; i < *total; i++) {
         if (strcmp(mochila[i].nome, nomeBusca) == 0) {
             encontradoIdx = i;
@@ -143,9 +151,9 @@ void removerItem(Item mochila[], int* total) {
         }
     }
 
-    // Se o item foi localizado, reorganiza o vetor
+    // Se o item foi localizado, fazemos a remocao reorganizando o vetor
     if (encontradoIdx != -1) {
-        // Desloca os elementos subsequentes para nao deixar buracos na lista sequencial
+        // Desloca os elementos subsequentes uma posicao para tras para nao deixar buracos na lista
         for (i = encontradoIdx; i < (*total) - 1; i++) {
             mochila[i] = mochila[i + 1];
         }
@@ -153,9 +161,10 @@ void removerItem(Item mochila[], int* total) {
         // Decrementa o total de itens cadastrados
         (*total)--;
         
+        // Mensagem de confirmacao exata do Print 5
         printf("\nItem '%s' removido com sucesso!\n", nomeBusca);
         
-        // Exibe a listagem atualizada imediatamente apos a operacao
+        // REQUISITO: Exibe a listagem atualizada imediatamente apos a operacao
         listarItens(mochila, *total);
     } else {
         printf("\nItem '%s' nao encontrado na mochila.\n", nomeBusca);
@@ -166,7 +175,7 @@ void removerItem(Item mochila[], int* total) {
 }
 
 /* ============================================================================
- FUNCAO: Listar Itens - Formato de Tabela Estrito
+ FUNCAO: Listar Itens - Formato de Tabela exato dos Prints 2 e 5
  ============================================================================
  */
 void listarItens(Item mochila[], int total) {
@@ -190,6 +199,42 @@ void listarItens(Item mochila[], int total) {
 }
 
 /* ============================================================================
+ REQUISITO: Busca Sequencial por Nome
+ ============================================================================
+ */
+void buscarItem(Item mochila[], int total) {
+    if (total == 0) {
+        printf("\nA mochila esta vazia. Nao ha o que buscar!\n");
+        return;
+    }
+
+    char nomeBusca[30];
+    int i;
+    int achou = 0;
+
+    printf("\n--- Buscar Item (Busca Sequencial) ---\n");
+    printf("Digite o nome do item que deseja procurar: ");
+    scanf("%29s", nomeBusca);
+    limparBuffer();
+
+    // Algoritmo clássico de busca sequencial percorrendo elemento por elemento
+    for (i = 0; i < total; i++) {
+        if (strcmp(mochila[i].nome, nomeBusca) == 0) {
+            printf("\nItem localizado com sucesso!\n");
+            printf("-> Nome: %s\n", mochila[i].nome);
+            printf("-> Tipo: %s\n", mochila[i].tipo);
+            printf("-> Quantidade: %d\n", mochila[i].quantidade);
+            achou = 1;
+            break; // Interrompe o laço pois ja encontrou o registro unico
+        }
+    }
+
+    if (!achou) {
+        printf("\nO item '%s' nao foi encontrado no seu inventario.\n", nomeBusca);
+    }
+}
+
+/* ============================================================================
  FUNCAO AUXILIAR: Limpeza de Buffer do Teclado
  ============================================================================
  */
@@ -197,4 +242,3 @@ void limparBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
-
